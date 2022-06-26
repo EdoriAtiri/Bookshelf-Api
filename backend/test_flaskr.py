@@ -98,7 +98,32 @@ class BookTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "unprocessable_entry")
 
+    # @TODO: Create a new endpoint or update a previous endpoint to handle searching for a team in the title
+    #        the body argument is called 'search' coming from the frontend.
+    #        If you use a different argument, make sure to update it in the frontend code.
+    #        The endpoint will need to return success value, a list of books for the search and the number of books with the search term
+    #        Response body keys: 'success', 'books' and 'total_books'
 
+    def test_get_book_search_with_results(self):
+        res = self.client().post('/search', json={"search": "Novel"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['total_books'], 4)
+        self.assertEqual(len(data['books']), 4)
+    
+    
+    def test_get_book_search_without_results(self):
+        res = self.client().post('/search', json={"search": "applejacks"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['total_books'], 0)
+        self.assertEqual(len(data['books']), 0)
+    
+    
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()

@@ -1,3 +1,4 @@
+from operator import le
 import os
 from flask import Flask, request, abort, jsonify
 from models import setup_db, Book
@@ -154,6 +155,34 @@ def create_app(test_config=None):
 
         except:
             abort(422)
+
+  # @TODO: Create a new endpoint or update a previous endpoint to handle searching for a team in the title
+    #        the body argument is called 'search' coming from the frontend.
+    #        If you use a different argument, make sure to update it in the frontend code.
+    #        The endpoint will need to return success value, a list of books for the search and the number of books with the search term
+    #        Response body keys: 'success', 'books' and 'total_books'
+
+    @app.route("/search", methods=["POST"])
+    def search_books():
+        body = request.get_json()
+
+        search_term = body.get('search', None)
+     
+        try:
+            books = Book.query.order_by(Book.id).filter(Book.title.ilike('%{}%'.format(search_term)))
+            
+            current_books = paginate_books(request, books)
+
+            return jsonify({
+                "success": True,
+                "books":current_books,
+                "total_books": len(books.all())
+            })
+
+          
+        except:
+            abort(422)
+
 
 
     #        Response body keys: 'success', 'created'(id of created book), 'books' and 'total_books'
